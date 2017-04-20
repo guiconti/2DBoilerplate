@@ -2,30 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(BoxCollider2D))]
-public class Controller2D : MonoBehaviour {
-
-	public LayerMask collisionMask;
-
-	const float skinWidth = .015f;
-	public int horizontalRayCount = 4;
-	public int verticalRayCount = 4;
-
-	float horizontalRaySpacing;
-	float verticalRaySpacing;
+public class Controller2D : RaycastController {
 
 	float maxClimbAngle = 80f;
 	float maxDescendAngle = 75f;
 
-	BoxCollider2D collider;
-	RaycastOrigins raycastOrigins;
 	public CollisionInfo collisions;
 
-	void Start (){
-
-		collider = GetComponent<BoxCollider2D>();
-		CalculateRaySpacing();
-		
+	public override void Start(){
+		base.Start();
 	}
 
 	public void Move(Vector3 velocity){
@@ -176,7 +161,6 @@ public class Controller2D : MonoBehaviour {
 			collisions.slopeAngle = slopeAngle;
 
 		}
-
 	}
 
 	void DescendSlope (ref Vector3 velocity){
@@ -205,39 +189,7 @@ public class Controller2D : MonoBehaviour {
 				}
 			}
 		}
-	}
-
-	void UpdateRaycastOrigins(){
-
-		Bounds bounds = collider.bounds;
-		bounds.Expand(skinWidth * -2);
-
-		raycastOrigins.topLeft = new Vector2(bounds.min.x, bounds.max.y);
-		raycastOrigins.topRight = new Vector2(bounds.max.x, bounds.max.y);
-		raycastOrigins.bottomLeft = new Vector2(bounds.min.x, bounds.min.y);
-		raycastOrigins.bottomRight = new Vector2(bounds.max.x, bounds.min.y);
-
-	}
-
-	void CalculateRaySpacing() {
-
-		Bounds bounds = collider.bounds;
-		bounds.Expand(skinWidth * -2);
-
-		horizontalRayCount = Mathf.Clamp(horizontalRayCount, 2, int.MaxValue);
-		verticalRayCount = Mathf.Clamp(verticalRayCount, 2, int.MaxValue);
-
-		horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
-		verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
-
-	}
-
-	struct RaycastOrigins {
-		public Vector2 topLeft;
-		public Vector2 topRight;
-		public Vector2 bottomLeft;
-		public Vector2 bottomRight;
-	}
+	}  
 
 	public struct CollisionInfo {
 
@@ -259,9 +211,5 @@ public class Controller2D : MonoBehaviour {
 			slopeAngle = 0;
 
 		}
-
 	}
-
-	
-    
 }
