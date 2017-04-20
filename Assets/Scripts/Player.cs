@@ -28,6 +28,11 @@ public class Player : MonoBehaviour {
 	float maxJumpVelocity;
 	float minJumpVelocity;
 
+	[Range(0, 1)]
+	public float doubleJumpPercentage;
+
+	bool doubleJumpAvailable = true;
+
 	Controller2D controller;
 
 	void Start () {
@@ -47,10 +52,10 @@ public class Player : MonoBehaviour {
 		float targetVelocityX = input.x * moveSpeed;
 		velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, controller.collisions.below?accelerationTimeGrounded:accelerationTimeAirborne);
 
-		bool wallSlinding = false;
+		bool wallSliding = false;
 
 		if ((controller.collisions.left || controller.collisions.right) && !controller.collisions.below && velocity.y < 0){
-			wallSlinding = true;
+			wallSliding = true;
 
 			if (velocity.y < -wallSlideSpeedMax){
 				velocity.y = -wallSlideSpeedMax;
@@ -73,15 +78,20 @@ public class Player : MonoBehaviour {
 
 		}
 
-		if (controller.collisions.above || controller.collisions.below) {
+		if (controller.collisions.below) {
 
+			doubleJumpAvailable = true;
 			velocity.y = 0;
 
+		} else if (controller.collisions.above){
+
+			velocity.y = 0;
+			
 		}
 
 		if (Input.GetKeyDown(KeyCode.Space)) {
 
-			if (wallSlinding){
+			if (wallSliding){
 				
 				if (wallDirectionX == input.x){
 
@@ -102,7 +112,14 @@ public class Player : MonoBehaviour {
 			}
 
 			if (controller.collisions.below){
+
 				velocity.y = maxJumpVelocity;
+
+			} else if (doubleJumpAvailable && !wallSliding){
+
+				velocity.y = maxJumpVelocity * doubleJumpPercentage;
+				doubleJumpAvailable = false;
+
 			}
 		}
 
